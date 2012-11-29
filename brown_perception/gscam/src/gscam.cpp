@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <string>
 
 #include <iostream>
 extern "C"{
@@ -28,6 +29,9 @@ int width, height;
 sensor_msgs::CameraInfo camera_info;
 
 int main(int argc, char** argv) {
+  
+  sensor_msgs::Image msg;
+
 	char *config = getenv("GSCAM_CONFIG");
 	if (config == NULL) {
 		std::cout << "Problem getting GSCAM_CONFIG variable." << std::endl;
@@ -113,6 +117,8 @@ int main(int argc, char** argv) {
 
 	int preroll;
 	nh.param("brown/gscam/preroll", preroll, 0);
+	nh.param<std::string>("brown/gscam/frame_id", msg.header.frame_id, "camera");
+
 	if (preroll) {
 		//The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll
 		//I am told this is needed and am erring on the side of caution.
@@ -158,7 +164,6 @@ int main(int argc, char** argv) {
 		gst_structure_get_int(structure,"width",&width);
 		gst_structure_get_int(structure,"height",&height);
 
-		sensor_msgs::Image msg;
 		msg.width = width; 
 		msg.height = height;
 		msg.encoding = "rgb8";
